@@ -1,0 +1,19 @@
+credentials:
+  usernames:
+    admin:
+      email: admin@email.com
+      name: Administrador
+      password: admin123
+
+    teste:
+      email: teste@email.com
+      name: Usuário Teste
+      password: teste123
+
+cookie:
+  expiry_days: 1
+  key: insightfinance
+  name: insightfinance_cookie
+
+preauthorized:
+  emails: []
