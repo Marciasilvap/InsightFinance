@@ -249,8 +249,13 @@ pagina = st.sidebar.radio(
 
 [
 "Dashboard",
+
 "Vendas",
-"Despesas"
+
+"Despesas",
+
+"Guia"
+
 ]
 
 )
@@ -400,9 +405,35 @@ elif pagina == "Despesas":
 
     )
 
+elif pagina == "Guia":
 
-st.divider()
+    st.header("📘 Como usar")
 
-st.caption(
-"InsightFinance • versão 2.1"
-)
+
+    st.info(
+"""
+1 Atualize a planilha Excel
+
+2 Salve o arquivo
+
+3 Atualize o sistema
+
+4 Consulte Dashboard
+"""
+    )
+
+
+    with open(
+"data/Controle_Financeiro_Pequenas_Empresas.xlsx",
+"rb"
+    ) as f:
+
+        st.download_button(
+
+"📥 Baixar planilha modelo",
+
+data=f,
+
+file_name="Modelo_InsightFinance.xlsx"
+
+        )
