@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+import yaml
+import streamlit_authenticator as stauth
+from yaml.loader import SafeLoader
 
 # ==================================================
 # CONFIG
@@ -10,7 +13,40 @@ st.set_page_config(
     layout="wide",
     page_icon="📊"
 )
+# ==================================================
+# LOGIN
+# ==================================================
 
+with open("usuarios.yaml") as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+authenticator = stauth.Authenticate(
+    config["credentials"],
+    config["cookie"]["name"],
+    config["cookie"]["key"],
+    config["cookie"]["expiry_days"]
+)
+
+authenticator.login()
+
+if st.session_state["authentication_status"] is False:
+    st.error("Usuário ou senha incorretos")
+    st.stop()
+
+elif st.session_state["authentication_status"] is None:
+    st.warning("Digite login e senha")
+    st.stop()
+
+elif st.session_state["authentication_status"]:
+
+    st.sidebar.success(
+        f"Olá {st.session_state['name']}"
+    )
+
+    authenticator.logout(
+        "Sair",
+        "sidebar"
+    )
 # ==================================================
 # ESTILO
 # ==================================================
