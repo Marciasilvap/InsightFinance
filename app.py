@@ -64,7 +64,6 @@ padding-bottom:0rem;
 
 }
 
-
 /* Fundo */
 
 .main{
@@ -73,12 +72,17 @@ background:#F5F7FA;
 
 }
 
-
 /* Sidebar */
 
 [data-testid="stSidebar"]{
 
-background:#0F172A;
+background:
+linear-gradient(
+180deg,
+#06111F,
+#0F172A,
+#1E293B
+);
 
 }
 
@@ -87,7 +91,6 @@ background:#0F172A;
 color:white;
 
 }
-
 
 /* Título */
 
@@ -101,6 +104,7 @@ margin-bottom:0;
 
 }
 
+/* KPIs */
 
 /* KPIs */
 
@@ -108,14 +112,16 @@ div[data-testid="metric-container"]{
 
 background:white;
 
-padding:10px;
+padding:16px;
 
 border-radius:18px;
+
+border-left:5px solid #2563EB;
 
 border:1px solid #E5E7EB;
 
 box-shadow:
-0 4px 12px rgba(0,0,0,.06);
+0 8px 20px rgba(0,0,0,.05);
 
 }
 
@@ -132,7 +138,6 @@ padding:5px;
 
 }
 
-
 /* Alerta */
 
 .stAlert{
@@ -141,19 +146,83 @@ border-radius:12px;
 
 }
 
-
 /* Subtítulos */
 
 h3{
 
 color:#1E293B;
-
 font-weight:700;
-
 margin-top:0;
 
 }
 
+/* ==========================
+BOTÕES SIDEBAR
+========================== */
+
+.stButton > button{
+
+background:#1E293B;
+color:white;
+
+border:none;
+
+border-radius:10px;
+
+padding:8px 16px;
+
+font-weight:600;
+
+}
+
+.stButton > button:hover{
+
+background:#334155;
+
+color:white;
+
+}
+
+/* Upload */
+
+[data-testid="stFileUploader"]{
+
+background:#1E293B;
+
+border-radius:10px;
+
+padding:10px;
+
+color:white;
+
+}
+
+/* BOTÃO INTERNO DO UPLOAD */
+
+[data-testid="stFileUploader"] button{
+
+background:#1E293B !important;
+
+color:white !important;
+
+border:none !important;
+
+border-radius:10px !important;
+
+font-weight:600;
+
+}
+
+/* Hover */
+
+[data-testid="stFileUploader"] button:hover{
+
+background:#334155 !important;
+
+color:white !important;
+
+}
+                      
 </style>
 
 """, unsafe_allow_html=True)
@@ -163,7 +232,6 @@ margin-top:0;
 # ==================================================
 
 from datetime import datetime
-
 
 col1,col2,col3 = st.columns([5,2,2])
 
@@ -189,32 +257,69 @@ with col3:
         datetime.today().strftime("%d/%m/%Y")
     )
 
+# ==================================================
+# UPLOAD EXCEL
+# ==================================================
+
+arquivo_upload = st.sidebar.file_uploader(
+
+    "Enviar planilha",
+
+    type=["xlsx"]
+
+)
+
+
+if "arquivo_atual" not in st.session_state:
+
+    st.session_state.arquivo_atual = (
+        "data/Controle_Financeiro_Pequenas_Empresas.xlsx"
+    )
+
+
+if arquivo_upload is not None:
+
+    st.session_state.arquivo_atual = (
+        arquivo_upload
+    )
+
+    st.sidebar.success(
+        "Planilha carregada"
+    )
+
+
+ARQUIVO = (
+    st.session_state.arquivo_atual
+)
 
 # ==================================================
 # CARREGAR
 # ==================================================
 
-ARQUIVO = "data/Controle_Financeiro_Pequenas_Empresas.xlsx"
-
-
 @st.cache_data
-def carregar():
+def carregar(arquivo):
 
     vendas = pd.read_excel(
-        ARQUIVO,
+
+        arquivo,
+
         sheet_name="Vendas"
+
     )
 
     despesas = pd.read_excel(
-        ARQUIVO,
+
+        arquivo,
+
         sheet_name="Despesas"
+
     )
 
     return vendas, despesas
 
-
-vendas, despesas = carregar()
-
+vendas, despesas = carregar(
+    ARQUIVO
+)
 
 # ==================================================
 # LIMPEZA
@@ -237,7 +342,6 @@ despesas["Valor"] = pd.to_numeric(
 despesas["Valor"],
 errors="coerce"
 ).fillna(0)
-
 
 # ==================================================
 # MENU
@@ -282,7 +386,6 @@ if pagina == "Dashboard":
         else 0
     )
 
-
     st.subheader("Resumo Financeiro")
 
     c1,c2,c3,c4,c5 = st.columns(5)
@@ -293,12 +396,10 @@ if pagina == "Dashboard":
     c4.metric("Margem",f"{margem:.1f}%")
     c5.metric("Ticket",f"R$ {ticket:,.0f}")
 
-
     if lucro > 0:
         st.success("🟢 Situação financeira saudável")
     else:
         st.error("🔴 Empresa em prejuízo")
-
 
     ranking = (
 
@@ -312,7 +413,6 @@ if pagina == "Dashboard":
 
     )
 
-
     graf = (
 
         despesas
@@ -322,9 +422,7 @@ if pagina == "Dashboard":
 
     )
 
-
     col1,col2,col3 = st.columns([1,1,1])
-
 
     with col1:
 
@@ -337,7 +435,6 @@ if pagina == "Dashboard":
                 height=150
             )
 
-
     with col2:
 
         with st.container(border=True):
@@ -348,7 +445,6 @@ if pagina == "Dashboard":
                 graf,
                 height=150
             )
-
 
     with col3:
 
@@ -386,7 +482,6 @@ elif pagina == "Vendas":
 
     )
 
-
 # ==================================================
 # DESPESAS
 # ==================================================
@@ -409,7 +504,6 @@ elif pagina == "Guia":
 
     st.header("📘 Como usar")
 
-
     st.info(
 """
 1 Atualize a planilha Excel
@@ -421,7 +515,6 @@ elif pagina == "Guia":
 4 Consulte Dashboard
 """
     )
-
 
     with open(
 "data/Controle_Financeiro_Pequenas_Empresas.xlsx",
@@ -437,3 +530,4 @@ data=f,
 file_name="Modelo_InsightFinance.xlsx"
 
         )
+
