@@ -536,11 +536,11 @@ with col2:
         st.subheader("💸 Despesas")
 
         tipo = st.selectbox(
-    "",
-    ["Barra","Categoria"],
-    key="despesas",
-    label_visibility="collapsed"
-)
+            "",
+            ["Barra", "Categoria"],
+            key="despesas",
+            label_visibility="collapsed"
+        )
 
 
         if tipo == "Barra":
