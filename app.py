@@ -583,40 +583,36 @@ with col2:
             )
 
             st.plotly_chart(
-
                 fig,
-
                 use_container_width=True
-
             )
-    
-    # ==========================
-    # ÚLTIMOS LANÇAMENTOS
-    # ==========================
+
+
+# ==========================
+# ÚLTIMOS LANÇAMENTOS
+# ==========================
 
 with col3:
 
-        with st.container(border=True):
+    with st.container(border=True):
 
-            st.subheader(
-                "📋 Últimos"
-            )
+        st.subheader("📋 Últimos")
 
-            st.dataframe(
+        st.dataframe(
 
-                vendas[
-                    [
-                        "Cliente",
-                        "Produto",
-                        "Valor Total"
-                    ]
-                ].tail(5),
+            vendas[
+                [
+                    "Cliente",
+                    "Produto",
+                    "Valor Total"
+                ]
+            ].tail(5),
 
-                height=200,
+            height=180,
 
-                use_container_width=True
+            use_container_width=True
 
-            )
+        )
 # ==================================================
 # VENDAS
 # ==================================================
