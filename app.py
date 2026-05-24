@@ -478,7 +478,6 @@ if pagina == "Dashboard":
         st.success(
             "🟢 Situação financeira saudável"
         )
-
     else:
         st.error(
             "🔴 Empresa em prejuízo"
@@ -508,7 +507,10 @@ if pagina == "Dashboard":
     )
 
 
-    col1,col2,col3 = st.columns([1,1,1], gap="small")
+    col1,col2,col3 = st.columns(
+        [1,1,1],
+        gap="small"
+    )
 
 
     # ==========================
@@ -525,94 +527,98 @@ if pagina == "Dashboard":
                 ranking,
                 height=200
             )
-# ==========================
-# DESPESAS
-# ==========================
-
-with col2:
-
-    with st.container(border=True):
-
-        st.subheader("💸 Despesas")
-
-        tipo = st.selectbox(
-            "",
-            ["Barra", "Categoria"],
-            key="despesas",
-            label_visibility="collapsed"
-        )
 
 
-        if tipo == "Barra":
+    # ==========================
+    # DESPESAS
+    # ==========================
 
-            st.bar_chart(
-                graf,
-                height=180
+    with col2:
+
+        with st.container(border=True):
+
+            st.subheader("💸 Despesas")
+
+            tipo = st.selectbox(
+                "",
+                ["Barra","Categoria"],
+                key="despesas",
+                label_visibility="collapsed"
             )
 
 
-        else:
+            if tipo == "Barra":
 
-            import plotly.express as px
+                st.bar_chart(
+                    graf,
+                    height=180
+                )
 
-            df_graf = graf.reset_index()
 
-            fig = px.pie(
+            else:
 
-                df_graf,
+                import plotly.express as px
 
-                names="Categoria",
+                df_graf = graf.reset_index()
 
-                values="Valor",
+                fig = px.pie(
 
-                hole=0.6
+                    df_graf,
 
-            )
+                    names="Categoria",
 
-            fig.update_layout(
+                    values="Valor",
+
+                    hole=0.6
+
+                )
+
+                fig.update_layout(
+
+                    height=180,
+
+                    margin=dict(
+                        t=10,
+                        b=10,
+                        l=10,
+                        r=10
+                    )
+
+                )
+
+                st.plotly_chart(
+                    fig,
+                    use_container_width=True
+                )
+
+
+    # ==========================
+    # ÚLTIMOS
+    # ==========================
+
+    with col3:
+
+        with st.container(border=True):
+
+            st.subheader("📋 Últimos")
+
+            st.dataframe(
+
+                vendas[
+                    [
+                        "Cliente",
+                        "Produto",
+                        "Valor Total"
+                    ]
+                ].tail(5),
 
                 height=180,
 
-                margin=dict(
-                    t=10,
-                    b=10,
-                    l=10,
-                    r=10
-                )
-
-            )
-
-            st.plotly_chart(
-                fig,
                 use_container_width=True
+
             )
 
 
-# ==========================
-# ÚLTIMOS LANÇAMENTOS
-# ==========================
-
-with col3:
-
-    with st.container(border=True):
-
-        st.subheader("📋 Últimos")
-
-        st.dataframe(
-
-            vendas[
-                [
-                    "Cliente",
-                    "Produto",
-                    "Valor Total"
-                ]
-            ].tail(5),
-
-            height=180,
-
-            use_container_width=True
-
-        )
 # ==================================================
 # VENDAS
 # ==================================================
@@ -624,12 +630,10 @@ if pagina == "Vendas":
     )
 
     st.dataframe(
-
         vendas,
-
         use_container_width=True
-
     )
+
 
 # ==================================================
 # DESPESAS
@@ -642,12 +646,11 @@ if pagina == "Despesas":
     )
 
     st.dataframe(
-
         despesas,
-
         use_container_width=True
-
     )
+
+
 # ==================================================
 # GUIA
 # ==================================================
@@ -662,23 +665,23 @@ if pagina == "Guia":
 
 2 Salve o arquivo
 
-3 Atualize o sistema
+3 Faça upload no sistema
 
 4 Consulte Dashboard
 """
     )
 
     with open(
-    "data/Controle_Financeiro_Pequenas_Empresas.xlsx",
-    "rb"
-) as f:
+        "data/Controle_Financeiro_Pequenas_Empresas.xlsx",
+        "rb"
+    ) as f:
 
-     st.download_button(
+        st.download_button(
 
-        "📥 Baixar planilha modelo",
+            "📥 Baixar planilha modelo",
 
-        data=f,
+            data=f,
 
-        file_name="Modelo_InsightFinance.xlsx"
+            file_name="Modelo_InsightFinance.xlsx"
 
-    )
+        )
