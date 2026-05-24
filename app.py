@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import yaml
+import plotly.express as px
 import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
 
@@ -13,12 +14,82 @@ st.set_page_config(
     layout="wide",
     page_icon="📊"
 )
+
+st.markdown("""
+
+<style>
+
+/* reduz espaço superior da página */
+.block-container{
+    padding-top:1rem;
+    padding-bottom:0rem;
+}
+
+
+/* títulos */
+h1{
+    font-size:34px !important;
+    margin-bottom:0rem !important;
+}
+
+h2{
+    font-size:28px !important;
+}
+
+h3{
+    font-size:20px !important;
+}
+
+
+/* métricas Receita, Lucro etc */
+[data-testid="stMetricValue"]{
+    font-size:34px;
+}
+
+
+/* nome das métricas */
+[data-testid="stMetricLabel"]{
+    font-size:14px;
+}
+
+
+/* sidebar */
+section[data-testid="stSidebar"] *{
+    font-size:15px;
+}
+
+
+/* tabelas */
+[data-testid="stDataFrame"]{
+    font-size:12px;
+}
+
+
+/* selectbox */
+.stSelectbox{
+    font-size:13px;
+}
+
+
+/* reduz espaço abaixo dos subtítulos */
+h1,h2,h3{
+    padding-bottom:0rem !important;
+    margin-bottom:0.2rem !important;
+}
+
+</style>
+
+""", unsafe_allow_html=True)
 # ==================================================
 # LOGIN
 # ==================================================
 
 with open("usuarios.yaml") as file:
-    config = yaml.load(file, Loader=SafeLoader)
+    config = yaml.load(
+        file,
+        Loader=SafeLoader
+    )
+
 
 authenticator = stauth.Authenticate(
     config["credentials"],
@@ -27,15 +98,21 @@ authenticator = stauth.Authenticate(
     config["cookie"]["expiry_days"]
 )
 
+
 authenticator.login()
 
+
 if st.session_state["authentication_status"] is False:
+
     st.error("Usuário ou senha incorretos")
     st.stop()
 
+
 elif st.session_state["authentication_status"] is None:
+
     st.warning("Digite login e senha")
     st.stop()
+
 
 elif st.session_state["authentication_status"]:
 
@@ -43,10 +120,12 @@ elif st.session_state["authentication_status"]:
         f"Olá {st.session_state['name']}"
     )
 
+
     authenticator.logout(
         "Sair",
         "sidebar"
     )
+ 
 # ==================================================
 # ESTILO
 # ==================================================
@@ -363,7 +442,6 @@ pagina = st.sidebar.radio(
 ]
 
 )
-
 # ==================================================
 # DASHBOARD
 # ==================================================
@@ -375,14 +453,14 @@ if pagina == "Dashboard":
     lucro = receita - gasto
 
     margem = (
-        lucro/receita*100
+        lucro / receita * 100
         if receita > 0
         else 0
     )
 
     ticket = (
-        receita/len(vendas)
-        if len(vendas)>0
+        receita / len(vendas)
+        if len(vendas) > 0
         else 0
     )
 
@@ -397,9 +475,15 @@ if pagina == "Dashboard":
     c5.metric("Ticket",f"R$ {ticket:,.0f}")
 
     if lucro > 0:
-        st.success("🟢 Situação financeira saudável")
+        st.success(
+            "🟢 Situação financeira saudável"
+        )
+
     else:
-        st.error("🔴 Empresa em prejuízo")
+        st.error(
+            "🔴 Empresa em prejuízo"
+        )
+
 
     ranking = (
 
@@ -413,6 +497,7 @@ if pagina == "Dashboard":
 
     )
 
+
     graf = (
 
         despesas
@@ -422,7 +507,13 @@ if pagina == "Dashboard":
 
     )
 
-    col1,col2,col3 = st.columns([1,1,1])
+
+    col1,col2,col3 = st.columns([1,1,1], gap="small")
+
+
+    # ==========================
+    # CLIENTES
+    # ==========================
 
     with col1:
 
@@ -432,21 +523,78 @@ if pagina == "Dashboard":
 
             st.bar_chart(
                 ranking,
-                height=150
+                height=200
             )
+# ==========================
+# DESPESAS
+# ==========================
 
-    with col2:
+with col2:
 
-        with st.container(border=True):
+    with st.container(border=True):
 
-            st.subheader("💸 Despesas")
+        st.subheader("💸 Despesas")
+
+        tipo = st.selectbox(
+    "",
+    ["Barra","Categoria"],
+    key="despesas",
+    label_visibility="collapsed"
+)
+
+
+        if tipo == "Barra":
 
             st.bar_chart(
                 graf,
-                height=150
+                height=180
             )
 
-    with col3:
+
+        else:
+
+            import plotly.express as px
+
+            df_graf = graf.reset_index()
+
+            fig = px.pie(
+
+                df_graf,
+
+                names="Categoria",
+
+                values="Valor",
+
+                hole=0.6
+
+            )
+
+            fig.update_layout(
+
+                height=180,
+
+                margin=dict(
+                    t=10,
+                    b=10,
+                    l=10,
+                    r=10
+                )
+
+            )
+
+            st.plotly_chart(
+
+                fig,
+
+                use_container_width=True
+
+            )
+    
+    # ==========================
+    # ÚLTIMOS LANÇAMENTOS
+    # ==========================
+
+with col3:
 
         with st.container(border=True):
 
@@ -456,19 +604,24 @@ if pagina == "Dashboard":
 
             st.dataframe(
 
-    vendas[
-        ["Cliente","Produto","Valor Total"]
-    ].tail(5),
+                vendas[
+                    [
+                        "Cliente",
+                        "Produto",
+                        "Valor Total"
+                    ]
+                ].tail(5),
 
-    height=170,
+                height=200,
 
-    use_container_width=True
-)
+                use_container_width=True
+
+            )
 # ==================================================
 # VENDAS
 # ==================================================
 
-elif pagina == "Vendas":
+if pagina == "Vendas":
 
     st.subheader(
         "📋 Histórico de vendas"
@@ -486,7 +639,7 @@ elif pagina == "Vendas":
 # DESPESAS
 # ==================================================
 
-elif pagina == "Despesas":
+if pagina == "Despesas":
 
     st.subheader(
         "💸 Histórico despesas"
@@ -499,8 +652,11 @@ elif pagina == "Despesas":
         use_container_width=True
 
     )
+# ==================================================
+# GUIA
+# ==================================================
 
-elif pagina == "Guia":
+if pagina == "Guia":
 
     st.header("📘 Como usar")
 
@@ -517,17 +673,16 @@ elif pagina == "Guia":
     )
 
     with open(
-"data/Controle_Financeiro_Pequenas_Empresas.xlsx",
-"rb"
-    ) as f:
+    "data/Controle_Financeiro_Pequenas_Empresas.xlsx",
+    "rb"
+) as f:
 
-        st.download_button(
+     st.download_button(
 
-"📥 Baixar planilha modelo",
+        "📥 Baixar planilha modelo",
 
-data=f,
+        data=f,
 
-file_name="Modelo_InsightFinance.xlsx"
+        file_name="Modelo_InsightFinance.xlsx"
 
-        )
-
+    )
