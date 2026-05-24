@@ -3,8 +3,7 @@ credentials:
     admin:
       email: cs.marcia1@gmail.com
       name: Márcia Administradora
-      password: admin123
-
+      password: $2b$12$UxwMY4nugYxMZxvIiq8yF.B1e8.O25ZHQYSZx/aHxjX7qxsBYE/nW
     teste:
       email: teste@email.com
       name: Usuário Teste
