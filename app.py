@@ -273,7 +273,7 @@ arquivo_upload = st.sidebar.file_uploader(
 if "arquivo_atual" not in st.session_state:
 
     st.session_state.arquivo_atual = (
-        "dados/Controle_Financeiro_Pequenas_Empresas.xlsx"
+        "data/Controle_Financeiro_Pequenas_Empresas.xlsx"
     )
 
 
@@ -517,7 +517,7 @@ elif pagina == "Guia":
     )
 
     with open(
-"dados/Controle_Financeiro_Pequenas_Empresas.xlsx",
+"data/Controle_Financeiro_Pequenas_Empresas.xlsx",
 "rb"
     ) as f:
 
